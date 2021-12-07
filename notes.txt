@@ -1,0 +1,44 @@
+GNL
+
+IDEE AVEC LISTES CHAINEES
+
+struct 
+{
+	char text[BUFFER_SIZE]
+	int size
+	next
+}
+
+Creer un buffer terminé non terminé par \0
+Creer un static char *save_prev
+Creer un t_list *l;
+
+save_prev = NULL
+Si save_prev contient \n et different de NULL
+	out = deal avec savep uniquement
+	free save_prev
+	return out
+l = NULL
+Ajouter save_prev dans l
+free save_prev
+read dans buffer
+Si (read == -1)
+	convert list to string
+	return string (ou NULL si liste vide)
+Tant que buffer ne contient ni \n ni \0
+	Ajouter buffer dans l
+	read dans buffer
+Ajouter dans l jusqu'au \n ou \0
+Sauvegarder le reste dans save_prev
+convert list to string
+return string
+
+
+========================
+convert list to string
+	malloc string of size = somme maillon + 1
+	strlcat chaque maillon
+	free la list
+	return
+
+
