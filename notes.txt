@@ -2,20 +2,19 @@ GNL
 
 IDEE AVEC LISTES CHAINEES
 
-struct 
+struct
 {
 	char text[BUFFER_SIZE]
-	int size
 	next
 }
 
-Creer un buffer terminé non terminé par \0
+Creer un buffer terminé
 Creer un static char *save_prev
 Creer un t_list *l;
 
 save_prev = NULL
 Si save_prev contient \n et different de NULL
-	out = deal avec savep uniquement
+	out = deal avec save_prev uniquement
 	free save_prev
 	return out
 l = NULL
@@ -40,5 +39,3 @@ convert list to string
 	strlcat chaque maillon
 	free la list
 	return
-
-
