@@ -9,14 +9,19 @@ int main()
 	char *save_prev = ft_strdup("Hello\nCa va ?\nBien et toi ?\nTop!");
 	printf("%s\n\n==========\n", save_prev);
 	char *out = return_from_save_prev(&save_prev);
-	printf("%s\n\n", out);
+	printf("%s--\n", out);
 	printf("%s\n\n==========\n", save_prev);
+	free(out);
 
 	out = return_from_save_prev(&save_prev);
-	printf("%s\n\n", out);
+	printf("%s--\n", out);
 	printf("%s\n\n==========\n", save_prev);
+	free(out);
 
 	out = return_from_save_prev(&save_prev);
-	printf("%s\n\n", out);
+	printf("%s--\n", out);
 	printf("%s\n\n==========\n", save_prev);
+	free(out);
+
+	system("leaks a.out");
 }

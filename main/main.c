@@ -6,7 +6,7 @@
 /*   By: alefranc <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/02 08:43:14 by alefranc          #+#    #+#             */
-/*   Updated: 2021/12/02 13:05:29 by alefranc         ###   ########.fr       */
+/*   Updated: 2021/12/13 12:30:47 by alefranc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,19 @@
 #include <stdio.h>
 #include <fcntl.h>
 
+
 int	main()
 {
 	int		fd;
-	char	str[10];
+	char	*str;
 
 	fd = open("test1.txt", O_RDONLY);
-	read(fd, str, 9);
-	printf("%s\n", str);
-	read(fd, str, 9);
-	printf("%s\n", str);
-	/* while ((str = get_next_line(fd) != NULL)) */
-	/* { */
-	/* 	printf("%s\n", str) */
-	/* } */
+	str = get_next_line(fd);
+	printf("Main : %s", str);
+	// while ((str = get_next_line(fd)) != NULL)
+	// {
+	// 	printf("In main : %s\n\n", str);
+	// 	fflush(stdout);
+	// }
 	close(fd);
 }

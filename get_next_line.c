@@ -6,11 +6,13 @@
 /*   By: alefranc <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/02 08:30:21 by alefranc          #+#    #+#             */
-/*   Updated: 2021/12/02 13:05:23 by alefranc         ###   ########.fr       */
+/*   Updated: 2021/12/13 12:30:50 by alefranc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>
+#include <string.h>
 
 size_t	ft_strlen(const char *s)
 {
@@ -48,7 +50,7 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 	return (size + src_len);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char *s1, char const *s2)
 {
 	char	*joined;
 	size_t	s1_len;
@@ -61,8 +63,15 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	joined = malloc((s1_len + s2_len + 1) * sizeof(*joined));
 	if (joined == NULL)
 		return (NULL);
+	joined[0] = '\0';
+	printf("in strjoin (s1) : %s\n", s1);
+	printf("in strjoin (joined) : %s\n", joined);
 	ft_strlcat(joined, s1, s1_len + s2_len + 1);
+	printf("in strjoin (joined) : %s\n", joined);
 	ft_strlcat(joined, s2, s1_len + s2_len + 1);
+	printf("in strjoin (joined) : %s\n", joined);
+	free(s1);
+	s1 = NULL;
 	return (joined);
 }
 
@@ -110,6 +119,15 @@ char	*ft_strdup(const char *s)
 	return (dup);
 }
 
+// Input : save_prev is a pointer to a string containing at least 1 \n
+// Description : Modify save_prev to a new string which is the right side
+//				 of the initial string delimited by the first \n
+// Return : A new string which is the left side of the initial string
+//			delimited by the first \n
+// Example : return_from_save_prev("Salut\nComment ca va?\nBien merci")
+//			 return : "Salut\n"
+//			 save_prev : "Comment ca va?\nBien merci"
+// Warning : Crash if there is not \n
 char	*return_from_save_prev(char	**save_prev)
 {
 	char	*save_tmp;
@@ -121,31 +139,39 @@ char	*return_from_save_prev(char	**save_prev)
 	save_tmp = ft_strdup(ptr_newline + 1);
 	if (save_tmp == NULL)
 		return (NULL);
-	output = ft_strdup(*save_prev);
-	free(*save_prev);
+	output = ft_strjoin(*save_prev, "\n");
 	*save_prev = save_tmp;
 	return (output);
 }
 
-void	get_next_line_part2(char **str, char **save_prev, int fd)
-{
-	char	buffer[BUFFER_SIZE + 1];
-	ssize_t	read_r;
+// void	get_next_line_part2(char **str, char **save_prev, int fd)
+// {
+// 	char	buffer[BUFFER_SIZE + 1];
+// 	ssize_t	read_r;
+//
+// 	buffer[BUFFER_SIZE] = '\0';
+// 	read_return = read(fd, buffer, BUFFER_SIZE);
+// 	if (read_return == -1)
+// 		return (-1);
+// 	if (read_return == 0)
+// 		;
+// }
 
-	buffer[BUFFER_SIZE] = '\0';
-	read_return = read(fd, buffer, BUFFER_SIZE);
-	if (read_return == -1)
-		return (-1);
-	if (read_return == 0)
-		;
-}
-
+// Protect for incorrect fd and BUFFER_SIZE
+// Check if a save from a previous call exists and if so, if there is a \n in.
+// If yes call return_from_save_prev and return it.
+//
+// Otherwise, read BUFFER_SIZE bytes to buffer.
+// Create str from save_prev
+// While we didn't meet a \n and we didn't reach EOF
+//     append str with buffer and read BUFFER_SIZE new bytes to buffer
+//
 char	*get_next_line(int fd)
 {
 	static char	*save_prev = NULL;
 	char		buffer[BUFFER_SIZE + 1];
 	char		*str;
-	ssize_t		read_r;
+	ssize_t		read_return;
 
 	if (fd < 0 || BUFFER_SIZE < 1)
 		return (NULL);
@@ -154,7 +180,22 @@ char	*get_next_line(int fd)
 	buffer[BUFFER_SIZE] = '\0';
 	read_return = read(fd, buffer, BUFFER_SIZE);
 	str = ft_strdup(save_prev);
-	while (ft_strchr())
+	printf("str before loop : %s\n", str);
+	printf("buffer before loop : %s\n", buffer);
+	while (ft_strchr(buffer, '\n') == NULL && read_return == BUFFER_SIZE)
+	{
+		str = ft_strjoin(str, buffer);
+		printf("str in loop : %s\n", str);
+		read_return = read(fd, buffer, BUFFER_SIZE);
+	}
+	save_prev = ft_strdup(buffer);
+	// printf("save_prev after loop : %s\n", save_prev);
+	// printf("save_prev ptr : %p\n", save_prev);
+	printf("str after loop : %s\n", str);
+	char *s2 = return_from_save_prev(&save_prev);
+	printf("return of return_from_save_prev : %s", s2);
+	str = ft_strjoin(str, s2);
+	printf("full str : %s\n", str);
 	// while (ft_strchr(buffer, '\n') == NULL && read_return > 0)
 	// {
 	// 	str = ft_strdup(save_prev);
