@@ -12,6 +12,60 @@
 
 #include "get_next_line.h"
 
+size_t	ft_strlen(const char *s)
+{
+	size_t	i;
+
+	i = 0;
+	while (s[i] != '\0')
+		i++;
+	return (i);
+}
+
+size_t	ft_strlcat(char *dest, const char *src, size_t size)
+{
+	size_t	j;
+	size_t	dst_len;
+	size_t	src_len;
+
+	dst_len = ft_strlen(dest);
+	src_len = ft_strlen(src);
+	j = size;
+	while (*dest != '\0')
+	{
+		dest++;
+		if (j > 0)
+			j--;
+	}
+	while (*src != '\0' && j > 1)
+	{
+		*dest++ = *src++;
+		j--;
+	}
+	*dest = '\0';
+	if (size > dst_len)
+		return (dst_len + src_len);
+	return (size + src_len);
+}
+
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	char	*joined;
+	size_t	s1_len;
+	size_t	s2_len;
+
+	if (s1 == NULL || s2 == NULL)
+		return (NULL);
+	s1_len = ft_strlen(s1);
+	s2_len = ft_strlen(s2);
+	joined = malloc((s1_len + s2_len + 1) * sizeof(*joined));
+	if (joined == NULL)
+		return (NULL);
+	ft_strlcat(joined, s1, s1_len + s2_len + 1);
+	ft_strlcat(joined, s2, s1_len + s2_len + 1);
+	return (joined);
+}
+
 char	*ft_strchr(const char *s, int c)
 {
 	char	*ptr;
@@ -32,13 +86,14 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-
 char	*ft_strdup(const char *s)
 {
 	char	*dup;
 	size_t	i;
 	size_t	len;
 
+	if (s == NULL)
+		return (ft_strdup(""));
 	len = 0;
 	while (s[len] != '\0')
 		len++;
@@ -72,48 +127,41 @@ char	*return_from_save_prev(char	**save_prev)
 	return (output);
 }
 
-// Create a new node with content
-// Free content and set it to NULL
-// Add the new node to the list
-// void	ft_lstadd_back(t_list **alst, char **content)
-// {
-// 	t_list	*lst;
-// 	t_list	*node;
-//
-// 	node = (t_list *)malloc(1 * sizeof(*node));
-// 	if (node == NULL)
-// 		return (NULL);
-// 	node->content = *content;
-// 	node->next = NULL;
-// 	free(*content);
-// 	*content = NULL;
-// 	if (alst == NULL)
-// 		return ;
-// 	if (*alst == NULL)
-// 	{
-// 		*alst = node;
-// 		return ;
-// 	}
-// 	lst = *alst;
-// 	while (lst->next != NULL)
-// 		lst = lst->next;
-// 	lst->next = node;
-// }
-
-get_next_line_part2(t_list **lst, char **str)
+void	get_next_line_part2(char **str, char **save_prev, int fd)
 {
 	char	buffer[BUFFER_SIZE + 1];
+	ssize_t	read_r;
+
+	buffer[BUFFER_SIZE] = '\0';
+	read_return = read(fd, buffer, BUFFER_SIZE);
+	if (read_return == -1)
+		return (-1);
+	if (read_return == 0)
+		;
 }
 
 char	*get_next_line(int fd)
 {
 	static char	*save_prev = NULL;
-	t_list		*lst;
+	char		buffer[BUFFER_SIZE + 1];
 	char		*str;
+	ssize_t		read_r;
 
+	if (fd < 0 || BUFFER_SIZE < 1)
+		return (NULL);
 	if (save_prev != NULL && ft_strchr(save_prev, '\n') != NULL)
 		return (return_from_save_prev(&save_prev));
-	lst = NULL;
-	ft_lstadd_back(&lst, &save_prev); // it should also free save_prev and set to NULL
-	
+	buffer[BUFFER_SIZE] = '\0';
+	read_return = read(fd, buffer, BUFFER_SIZE);
+	str = ft_strdup(save_prev);
+	while (ft_strchr())
+	// while (ft_strchr(buffer, '\n') == NULL && read_return > 0)
+	// {
+	// 	str = ft_strdup(save_prev);
+	// 	if (read_return !)
+	// 		;
+	// 	if (ft_strchr(buffer, '\n'))
+	// 		;
+	// }
+	return (str);
 }
