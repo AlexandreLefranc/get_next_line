@@ -64,12 +64,8 @@ char	*ft_strjoin(char *s1, char const *s2)
 	if (joined == NULL)
 		return (NULL);
 	joined[0] = '\0';
-	printf("in strjoin (s1) : %s\n", s1);
-	printf("in strjoin (joined) : %s\n", joined);
 	ft_strlcat(joined, s1, s1_len + s2_len + 1);
-	printf("in strjoin (joined) : %s\n", joined);
 	ft_strlcat(joined, s2, s1_len + s2_len + 1);
-	printf("in strjoin (joined) : %s\n", joined);
 	free(s1);
 	s1 = NULL;
 	return (joined);
@@ -180,8 +176,8 @@ char	*get_next_line(int fd)
 	buffer[BUFFER_SIZE] = '\0';
 	read_return = read(fd, buffer, BUFFER_SIZE);
 	str = ft_strdup(save_prev);
-	printf("str before loop : %s\n", str);
-	printf("buffer before loop : %s\n", buffer);
+	// printf("str before loop : %s\n", str);
+	// printf("buffer before loop : %s\n", buffer);
 	while (ft_strchr(buffer, '\n') == NULL && read_return == BUFFER_SIZE)
 	{
 		str = ft_strjoin(str, buffer);
@@ -189,20 +185,13 @@ char	*get_next_line(int fd)
 		read_return = read(fd, buffer, BUFFER_SIZE);
 	}
 	save_prev = ft_strdup(buffer);
-	// printf("save_prev after loop : %s\n", save_prev);
-	// printf("save_prev ptr : %p\n", save_prev);
+	printf("save_prev after loop : %s\n", save_prev);
+	printf("save_prev ptr : %p\n", save_prev);
 	printf("str after loop : %s\n", str);
 	char *s2 = return_from_save_prev(&save_prev);
 	printf("return of return_from_save_prev : %s", s2);
-	str = ft_strjoin(str, s2);
+	fflush(stdout);
+	// str = ft_strjoin(str, return_from_save_prev(&save_prev));
 	printf("full str : %s\n", str);
-	// while (ft_strchr(buffer, '\n') == NULL && read_return > 0)
-	// {
-	// 	str = ft_strdup(save_prev);
-	// 	if (read_return !)
-	// 		;
-	// 	if (ft_strchr(buffer, '\n'))
-	// 		;
-	// }
 	return (str);
 }

@@ -20,7 +20,16 @@ int	main()
 	int		fd;
 	char	*str;
 
-	fd = open("test1.txt", O_RDONLY);
+	fd = open("../test_no_trailing_nl.txt", O_RDONLY);
+	printf("FD = %d\n", fd);
+	fflush(stdout);
+
+	str = get_next_line(fd);
+	printf("Main : %s", str);
+
+	str = get_next_line(fd);
+	printf("Main : %s", str);
+
 	str = get_next_line(fd);
 	printf("Main : %s", str);
 	// while ((str = get_next_line(fd)) != NULL)
