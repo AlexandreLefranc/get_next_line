@@ -20,18 +20,21 @@ int	main()
 	int		fd;
 	char	*str;
 
-	fd = open("../test_no_trailing_nl.txt", O_RDONLY);
+	fd = open("../test1.txt", O_RDONLY);
 	printf("FD = %d\n", fd);
 	fflush(stdout);
 
 	str = get_next_line(fd);
-	printf("Main : %s", str);
+	printf("=================>Main : %s\n", str);
 
 	str = get_next_line(fd);
-	printf("Main : %s", str);
+	printf("=================>Main : %s\n", str);
 
 	str = get_next_line(fd);
-	printf("Main : %s", str);
+	printf("=================>Main : %s\n", str);
+
+	str = get_next_line(fd);
+	printf("=================>Main : %s\n", str);
 	// while ((str = get_next_line(fd)) != NULL)
 	// {
 	// 	printf("In main : %s\n\n", str);
