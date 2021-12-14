@@ -16,7 +16,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-# define BUFFER_SIZE 4
+# define BUFFER_SIZE 1024
 
 // Main function
 char	*get_next_line(int fd);
