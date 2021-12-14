@@ -35,6 +35,9 @@ int	main()
 
 	str = get_next_line(fd);
 	printf("=================>Main : %s\n", str);
+
+	str = get_next_line(fd);
+	printf("=================>Main : %s\n", str);
 	// while ((str = get_next_line(fd)) != NULL)
 	// {
 	// 	printf("In main : %s\n\n", str);
