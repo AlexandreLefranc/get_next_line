@@ -132,8 +132,8 @@ char	*get_next_line(int fd)
 		if (ft_strchr(str, '\n') != NULL)
 		{
 			ptr_tmp = str;
-			cache[fd] = ft_substr(str, (ft_strchr(str, '\n') - str + 1), ft_strlen(str));
-			str = ft_substr(str, 0, (ft_strchr(str, '\n') - str));
+			cache[fd] = ft_substr(ptr_tmp, (ft_strchr(ptr_tmp, '\n') - ptr_tmp + 1), ft_strlen(ptr_tmp));
+			str = ft_substr(ptr_tmp, 0, (ft_strchr(ptr_tmp, '\n') - ptr_tmp));
 			free(ptr_tmp);
 			ptr_tmp = NULL;
 			return (str);
@@ -142,8 +142,8 @@ char	*get_next_line(int fd)
 	if (ft_strchr(cache[fd], '\n') != NULL)
 	{
 		ptr_tmp = cache[fd];
-		cache[fd] = ft_substr(cache[fd], (ft_strchr(cache[fd], '\n') - cache[fd] + 1), ft_strlen(cache[fd]));
-		str = ft_substr(cache[fd], 0, (ft_strchr(cache[fd], '\n') - cache[fd]));
+		cache[fd] = ft_substr(ptr_tmp, (ft_strchr(ptr_tmp, '\n') - ptr_tmp + 1), ft_strlen(ptr_tmp));
+		str = ft_substr(ptr_tmp, 0, (ft_strchr(ptr_tmp, '\n') - ptr_tmp));
 		free(ptr_tmp);
 		ptr_tmp = NULL;
 		return (str);

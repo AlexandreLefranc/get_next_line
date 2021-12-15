@@ -20,8 +20,8 @@ int	main()
 	int		fd;
 	char	*str;
 
-	fd = open("../files/test1.txt", O_RDONLY);
-	//fd = open("../files/test_no_trailing_nl.txt", O_RDONLY);
+	//fd = open("../files/test1.txt", O_RDONLY);
+	fd = open("../files/test_no_trailing_nl.txt", O_RDONLY);
 	while ((str = get_next_line(fd)) != NULL)
 	{
 		printf("===========>%s\n\n", str);fflush(stdout);
