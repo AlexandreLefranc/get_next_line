@@ -25,6 +25,7 @@ int	main()
 	while ((str = get_next_line(fd)) != NULL)
 	{
 		printf("===========>%s\n\n", str);fflush(stdout);
+		free(str);
 	}
 	close(fd);
 }

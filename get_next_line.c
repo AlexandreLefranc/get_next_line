@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 
 size_t	ft_strlen(const char *s)
 {
@@ -21,6 +20,26 @@ size_t	ft_strlen(const char *s)
 	while (s[i] != '\0')
 		i++;
 	return (i);
+}
+
+char	*ft_strchr(const char *s, int c)
+{
+	char	*ptr;
+	char	c2;
+	size_t	i;
+
+	c2 = (char)c;
+	ptr = (char *)s;
+	i = 0;
+	while (ptr[i] != '\0')
+	{
+		if (ptr[i] == c2)
+			return (&ptr[i]);
+		i++;
+	}
+	if (ptr[i] == c2)
+		return (&ptr[i]);
+	return (NULL);
 }
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
@@ -74,127 +93,107 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 	return (size + src_len);
 }
 
-char	*ft_strjoin(char *s1, char *s2)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*joined;
-	size_t	i;
+	size_t	s1_len;
+	size_t	s2_len;
 
-	if (s1 == NULL)
-		s1 = ft_substr("", 0, 1);
-	if (s2 == NULL)
-		s2 = "";
-	joined = malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(*joined));
+	if (s1 == NULL || s2 == NULL)
+		return (NULL);
+	s1_len = ft_strlen(s1);
+	s2_len = ft_strlen(s2);
+	joined = malloc((s1_len + s2_len + 1) * sizeof(*joined));
 	if (joined == NULL)
 		return (NULL);
-	i = -1;
-	while (*s1 != '\0')
-	{
-		joined[++i] = *s1;
-		s1++;
-	}
-	while (*s2 != '\0')
-	{
-		joined[++i] = *s2;
-		s2++;
-	}
-	joined[++i] = '\0';
+	ft_strlcat(joined, s1, s1_len + s2_len + 1);
+	ft_strlcat(joined, s2, s1_len + s2_len + 1);
 	return (joined);
 }
 
-char	*ft_strchr(const char *s, int c)
-{
-	char	*ptr;
-	char	c2;
-	size_t	i;
 
-	c2 = (char)c;
-	ptr = (char *)s;
-	i = 0;
-	while (ptr[i] != '\0')
+char	*get_next_line(int fd)
+{
+	ssize_t		read_len;
+	char		*str;
+	char		buffer[BUFFER_SIZE + 1];
+	static char	*cache[MAX_FD];
+
+	char		*ptr_tmp;
+
+	str = ft_substr("", 0, 1);
+	while ((read_len = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
-		if (ptr[i] == c2)
-			return (&ptr[i]);
-		i++;
+		buffer[read_len] = '\0';
+		ptr_tmp = str;
+		str = ft_strjoin(str, buffer);
+		free(ptr_tmp);
+		ptr_tmp = NULL;
+		if (ft_strchr(str, '\n') != NULL)
+		{
+			ptr_tmp = str;
+			cache[fd] = ft_substr(str, (ft_strchr(str, '\n') - str + 1), ft_strlen(str));
+			str = ft_substr(str, 0, (ft_strchr(str, '\n') - str));
+			free(ptr_tmp);
+			ptr_tmp = NULL;
+			return (str);
+		}
 	}
-	if (ptr[i] == c2)
-		return (&ptr[i]);
-	return (NULL);
-}
-
-
-char	*extract_line(char **save_prev)
-{
-	char	*ptr_nl;
-	char	*extracted;
-	char	*new_save_prev;
-	size_t	left_len;
-
-	ptr_nl = ft_strchr(*save_prev, '\n');
-	if (ptr_nl == NULL)
+	if (ft_strchr(cache[fd], '\n') != NULL)
+	{
+		ptr_tmp = cache[fd];
+		cache[fd] = ft_substr(cache[fd], (ft_strchr(cache[fd], '\n') - cache[fd] + 1), ft_strlen(cache[fd]));
+		str = ft_substr(cache[fd], 0, (ft_strchr(cache[fd], '\n') - cache[fd]));
+		free(ptr_tmp);
+		ptr_tmp = NULL;
+		return (str);
+	}
+	else if (ft_strlen(cache[fd]) > 0)
+	{
+		str = cache[fd];
+		cache[fd] = ft_substr("", 0, 1);
+		return (str);
+	}
+	else
+	{
+		free(cache[fd]);
+		cache[fd] = NULL;
 		return (NULL);
-	left_len = ptr_nl - *save_prev + 1;
-	extracted = ft_substr(*save_prev, 0, left_len);
-	if (extracted == NULL)
-		return (NULL);
-	new_save_prev = ft_substr(*save_prev, left_len, ft_strlen(ptr_nl + 1));
-	if (new_save_prev == NULL)
-		return (NULL);
-	free (*save_prev);
-	*save_prev = new_save_prev;
-	return (extracted);
+	}
 }
 
 /*
-Check inputs
-If there is something in save_prev
-	If there is a \n
-		return leftside and save_prev = rightside
-	else
-		Add save_prev to str
-		free save_prev et set it to NULL
-while we didn't reach EOF
-	If there is no \n in buffer
-		Add buffer to str
-	else
-		Add leftside to str and copy rightside to save_prev
-		break
-return str
+LES DIFFERENTS CAS A PENSER
+1 - Cas ou buffer contient tout le fichier
+	a - Terminé par \n
+	b - Non terminé par \n
+2 - Cas ou buffer prend 1 caractere a la fois
+	a - Terminé par \n
+	b - Non terminé par \n
+3 - Cas ou buffer prends le nombre de caractere de la ligne
 */
-char	*get_next_line(int fd)
-{
-	static char	*save_prev = NULL;
-	char		*str;
-	char		buffer[BUFFER_SIZE + 1];
-	ssize_t		read_return;
 
-	// printf("Start of GNL\n");
-	// system("leaks -list -quiet a.out");
-	if (fd < 0 || BUFFER_SIZE < 1)
-		return (NULL);
-	str = NULL;
-	if (save_prev != NULL)
-	{
-		if (ft_strchr(save_prev, '\n') != NULL)
-			return (extract_line(&save_prev));
-		str = ft_strjoin(str, save_prev);
-		free(save_prev);
-		save_prev = NULL;
-	}
-	while ((read_return = read(fd, buffer, BUFFER_SIZE)) > 0)
-	{
-		buffer[read_return] = '\0';
-		if (ft_strchr(buffer, '\n') == NULL)
-			str = ft_strjoin(str, buffer);
-		else
-		{
-			save_prev = ft_substr(buffer, 0, ft_strlen(buffer));
-			//printf(">  In liip str = %s\n", str);
-			str = ft_strjoin(str, extract_line(&save_prev));
-			//printf(">  In Loop \n\n  str = %s \n\n  save_prev = %s\n", str, save_prev);
-			break ;
-		}
-	}
-	if (str[0] == '\0')
-		return (NULL);
-	return (str);
-}
+/*
+Declare ssize_t read_len;
+Declare char *str
+Declare char *buffer
+Init static char *cache[FD_MAX]
+
+str = substr("", 0, 1)
+Tant que (read_len = je lis quelque chose)
+	str = strjoin(str, buffer)
+	Si str contient \n
+		sauvegarder la partie droite dans cache[fd]
+		str = la partie gauche de str
+		return str
+Si cache[fd] contient \n
+	sauvegarder la partie droite dans cache[fd]
+	str = la partie gauche de cache[fd]
+	return str
+Sinon si len(cache[fd]) > 0
+	str = cache[fd]
+	return str
+Sinon
+	free cache[fd]
+	return NULL
+*/
