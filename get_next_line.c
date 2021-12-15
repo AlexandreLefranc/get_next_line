@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+// clangc main.c ../get_next_line.c -D BUFFER_SIZE=1 && ./a.out
+
 #include "get_next_line.h"
 
 size_t	ft_strlen(const char *s)
@@ -106,6 +108,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	joined = malloc((s1_len + s2_len + 1) * sizeof(*joined));
 	if (joined == NULL)
 		return (NULL);
+	joined[0] = '\0';
 	ft_strlcat(joined, s1, s1_len + s2_len + 1);
 	ft_strlcat(joined, s2, s1_len + s2_len + 1);
 	return (joined);
@@ -116,24 +119,29 @@ char	*get_next_line(int fd)
 {
 	ssize_t		read_len;
 	char		*str;
-	char		buffer[BUFFER_SIZE + 1];
+	char		*buffer;
 	static char	*cache[MAX_FD];
 
 	char		*ptr_tmp;
 
+	if (fd < 0 || BUFFER_SIZE < 1)
+		return (NULL);
 	str = ft_substr("", 0, 1);
-	while ((read_len = read(fd, buffer, BUFFER_SIZE)) > 0)
+	buffer = malloc((BUFFER_SIZE + 1) * sizeof(*buffer));
+	while ((read_len = read(fd, buffer, BUFFER_SIZE)) != 0)
 	{
+		if (read_len == -1)
+			return (NULL);
 		buffer[read_len] = '\0';
 		ptr_tmp = str;
-		str = ft_strjoin(str, buffer);
+		str = ft_strjoin(ptr_tmp, buffer);
 		free(ptr_tmp);
 		ptr_tmp = NULL;
 		if (ft_strchr(str, '\n') != NULL)
 		{
 			ptr_tmp = str;
 			cache[fd] = ft_substr(ptr_tmp, (ft_strchr(ptr_tmp, '\n') - ptr_tmp + 1), ft_strlen(ptr_tmp));
-			str = ft_substr(ptr_tmp, 0, (ft_strchr(ptr_tmp, '\n') - ptr_tmp));
+			str = ft_substr(ptr_tmp, 0, (ft_strchr(ptr_tmp, '\n') - ptr_tmp + 1));
 			free(ptr_tmp);
 			ptr_tmp = NULL;
 			return (str);
@@ -143,7 +151,7 @@ char	*get_next_line(int fd)
 	{
 		ptr_tmp = cache[fd];
 		cache[fd] = ft_substr(ptr_tmp, (ft_strchr(ptr_tmp, '\n') - ptr_tmp + 1), ft_strlen(ptr_tmp));
-		str = ft_substr(ptr_tmp, 0, (ft_strchr(ptr_tmp, '\n') - ptr_tmp));
+		str = ft_substr(ptr_tmp, 0, (ft_strchr(ptr_tmp, '\n') - ptr_tmp + 1));
 		free(ptr_tmp);
 		ptr_tmp = NULL;
 		return (str);
@@ -179,7 +187,9 @@ Declare char *str
 Declare char *buffer
 Init static char *cache[FD_MAX]
 
+protect
 str = substr("", 0, 1)
+malloc buffer
 Tant que (read_len = je lis quelque chose)
 	str = strjoin(str, buffer)
 	Si str contient \n

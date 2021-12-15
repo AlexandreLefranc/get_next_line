@@ -17,14 +17,45 @@
 
 int	main()
 {
-	int		fd;
+	int		fd = 0;
 	char	*str;
+	char	buffer[17];
 
-	//fd = open("../files/test1.txt", O_RDONLY);
+	ssize_t	r = read(1000, buffer, 16);
+	printf("%zi\n", r);
+
+	printf("\n\n----------------------\n\n");
+	while ((str = get_next_line(1000)) != NULL)
+	{
+		printf("===========>%s", str);fflush(stdout);
+		free(str);
+	}
+	close(fd);
+
+	printf("\n\n----------------------\n\n");
+	fd = open("../files/test1.txt", O_RDONLY);
+	//fd = open("../files/test_no_trailing_nl.txt", O_RDONLY);
+	while ((str = get_next_line(fd)) != NULL)
+	{
+		printf("===========>%s", str);fflush(stdout);
+		free(str);
+	}
+	close(fd);
+
+	printf("\n\n----------------------\n\n");
 	fd = open("../files/test_no_trailing_nl.txt", O_RDONLY);
 	while ((str = get_next_line(fd)) != NULL)
 	{
-		printf("===========>%s\n\n", str);fflush(stdout);
+		printf("===========>%s", str);fflush(stdout);
+		free(str);
+	}
+	close(fd);
+
+	printf("\n\n----------------------\n\n");
+	fd = open("../files/empty.txt", O_RDONLY);
+	while ((str = get_next_line(fd)) != NULL)
+	{
+		printf("===========>%s", str);fflush(stdout);
 		free(str);
 	}
 	close(fd);
