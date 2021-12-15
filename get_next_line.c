@@ -74,23 +74,30 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 	return (size + src_len);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*joined;
-	size_t	s1_len;
-	size_t	s2_len;
+	size_t	i;
 
 	if (s1 == NULL)
-		s1 = "";
+		s1 = ft_substr("", 0, 1);
 	if (s2 == NULL)
 		s2 = "";
-	s1_len = ft_strlen(s1);
-	s2_len = ft_strlen(s2);
-	joined = calloc((s1_len + s2_len + 1), sizeof(*joined));
+	joined = malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(*joined));
 	if (joined == NULL)
 		return (NULL);
-	ft_strlcat(joined, s1, s1_len + s2_len + 1);
-	ft_strlcat(joined, s2, s1_len + s2_len + 1);
+	i = -1;
+	while (*s1 != '\0')
+	{
+		joined[++i] = *s1;
+		s1++;
+	}
+	while (*s2 != '\0')
+	{
+		joined[++i] = *s2;
+		s2++;
+	}
+	joined[++i] = '\0';
 	return (joined);
 }
 
@@ -158,7 +165,10 @@ char	*get_next_line(int fd)
 	static char	*save_prev = NULL;
 	char		*str;
 	char		buffer[BUFFER_SIZE + 1];
+	ssize_t		read_return;
 
+	// printf("Start of GNL\n");
+	// system("leaks -list -quiet a.out");
 	if (fd < 0 || BUFFER_SIZE < 1)
 		return (NULL);
 	str = NULL;
@@ -170,17 +180,17 @@ char	*get_next_line(int fd)
 		free(save_prev);
 		save_prev = NULL;
 	}
-	buffer[BUFFER_SIZE] = '\0';
-	while (read(fd, buffer, BUFFER_SIZE) > 0)
+	while ((read_return = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
+		buffer[read_return] = '\0';
 		if (ft_strchr(buffer, '\n') == NULL)
 			str = ft_strjoin(str, buffer);
 		else
 		{
 			save_prev = ft_substr(buffer, 0, ft_strlen(buffer));
-			printf(">  In liip str = %s\n", str);
+			//printf(">  In liip str = %s\n", str);
 			str = ft_strjoin(str, extract_line(&save_prev));
-			printf(">  In Loop \n\n  str = %s \n\n  save_prev = %s\n", str, save_prev);
+			//printf(">  In Loop \n\n  str = %s \n\n  save_prev = %s\n", str, save_prev);
 			break ;
 		}
 	}
