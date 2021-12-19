@@ -13,6 +13,7 @@
 // clangc main.c ../get_next_line.c -D BUFFER_SIZE=1 && ./a.out
 
 #include "get_next_line.h"
+#include <stdio.h>
 
 size_t	ft_strlen(const char *s)
 {
@@ -69,105 +70,146 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (sub);
 }
 
-size_t	ft_strlcat(char *dest, const char *src, size_t size)
+char	*ft_strdup(char const *s)
 {
-	size_t	j;
-	size_t	dst_len;
-	size_t	src_len;
+	char	*dup;
 
-	dst_len = ft_strlen(dest);
-	src_len = ft_strlen(src);
-	j = size;
-	while (*dest != '\0')
-	{
-		dest++;
-		if (j > 0)
-			j--;
-	}
-	while (*src != '\0' && j > 1)
-	{
-		*dest++ = *src++;
-		j--;
-	}
-	*dest = '\0';
-	if (size > dst_len)
-		return (dst_len + src_len);
-	return (size + src_len);
+	dup = ft_substr(s, 0, ft_strlen(s));
+	if (dup == NULL)
+		return (NULL);
+	return (dup);
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*joined;
-	size_t	s1_len;
-	size_t	s2_len;
+	size_t	i;
+	size_t	j;
 
-	if (s1 == NULL || s2 == NULL)
-		return (NULL);
-	s1_len = ft_strlen(s1);
-	s2_len = ft_strlen(s2);
-	joined = malloc((s1_len + s2_len + 1) * sizeof(*joined));
+	joined = malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(*joined));
 	if (joined == NULL)
 		return (NULL);
-	joined[0] = '\0';
-	ft_strlcat(joined, s1, s1_len + s2_len + 1);
-	ft_strlcat(joined, s2, s1_len + s2_len + 1);
+	j = 0;
+	i = 0;
+	while (s1[i] != '\0')
+	{
+		joined[j] = s1[i];
+		i++;
+		j++;
+	}
+	i = 0;
+	while (s2[i] != '\0')
+	{
+		joined[j] = s2[i];
+		i++;
+		j++;
+	}
+	joined[j] = '\0';
 	return (joined);
 }
 
+int	update_cache(char **cache)
+{
+	char	*new_cache;
+	char	*ptr_nl;
+
+	ptr_nl = ft_strchr(*cache, '\n');
+	if (ptr_nl == NULL)
+		new_cache = NULL;
+	else
+	{
+		new_cache = ft_strdup(ptr_nl + 1);
+	}
+	free(*cache);
+	*cache = NULL;
+	if (new_cache == NULL)
+		return (-1);
+	*cache = new_cache;
+	return (0);
+}
+
+char	*extract_line(const char *cache)
+{
+	char	*line;
+	char	*ptr_nl;
+
+	ptr_nl = ft_strchr(cache, '\n');
+	if (ptr_nl == NULL)
+		line = ft_strdup(cache);
+	else
+		line = ft_substr(cache, 0, ptr_nl - cache + 1);
+	if (line == NULL)
+		return (NULL);
+	printf("line in extract : %s\n\n", line);
+	return (line);
+}
+
+int	get_line(int fd, char **cache)
+{
+	char	buf[BUFFER_SIZE + 1];
+	char	*new_cache;
+	ssize_t	ret;
+
+	ret = 1;
+	while (ret != 0 && ft_strchr(*cache, '\n') == NULL)
+	{
+		ret = read(fd, buf, BUFFER_SIZE);
+		if (ret == -1)
+		{
+			free (*cache);
+			*cache = NULL;
+			return (-1);
+		}
+		buf[ret] = '\0';
+		new_cache = ft_strjoin(*cache, buf);
+		free(*cache);
+		*cache = NULL;
+		if (new_cache == NULL)
+			return (-1);
+		*cache = new_cache;
+		printf("in get_line : %s\n\n\n", *cache);
+	}
+	return (0);
+}
+
+int	format_cache(char **cache)
+{
+	if (*cache == NULL)
+	{
+		*cache = ft_strdup("");
+		if (*cache == NULL)
+			return (-1);
+	}
+	return (0);
+}
 
 char	*get_next_line(int fd)
 {
-	ssize_t		read_len;
-	char		*str;
-	char		*buffer;
-	static char	*cache[MAX_FD];
-
-	char		*ptr_tmp;
+	static char	*cache[1024];
+	char		*line;
+	int			check;
 
 	if (fd < 0 || BUFFER_SIZE < 1)
 		return (NULL);
-	str = ft_substr("", 0, 1);
-	buffer = malloc((BUFFER_SIZE + 1) * sizeof(*buffer));
-	while ((read_len = read(fd, buffer, BUFFER_SIZE)) != 0)
-	{
-		if (read_len == -1)
-			return (NULL);
-		buffer[read_len] = '\0';
-		ptr_tmp = str;
-		str = ft_strjoin(ptr_tmp, buffer);
-		free(ptr_tmp);
-		ptr_tmp = NULL;
-		if (ft_strchr(str, '\n') != NULL)
-		{
-			ptr_tmp = str;
-			cache[fd] = ft_substr(ptr_tmp, (ft_strchr(ptr_tmp, '\n') - ptr_tmp + 1), ft_strlen(ptr_tmp));
-			str = ft_substr(ptr_tmp, 0, (ft_strchr(ptr_tmp, '\n') - ptr_tmp + 1));
-			free(ptr_tmp);
-			ptr_tmp = NULL;
-			return (str);
-		}
-	}
-	if (ft_strchr(cache[fd], '\n') != NULL)
-	{
-		ptr_tmp = cache[fd];
-		cache[fd] = ft_substr(ptr_tmp, (ft_strchr(ptr_tmp, '\n') - ptr_tmp + 1), ft_strlen(ptr_tmp));
-		str = ft_substr(ptr_tmp, 0, (ft_strchr(ptr_tmp, '\n') - ptr_tmp + 1));
-		free(ptr_tmp);
-		ptr_tmp = NULL;
-		return (str);
-	}
-	else if (ft_strlen(cache[fd]) > 0)
-	{
-		str = cache[fd];
-		cache[fd] = ft_substr("", 0, 1);
-		return (str);
-	}
-	else
+	check = format_cache(&cache[fd]);
+	if (check == -1)
+		return (NULL);
+	check = get_line(fd, &cache[fd]);
+	if (check == -1)
+		return (NULL);
+	line = extract_line(cache[fd]);
+	if (line == NULL)
 	{
 		free(cache[fd]);
-		cache[fd] = NULL;
 		return (NULL);
 	}
+	check = update_cache(&cache[fd]);
+	if (check == -1)
+	{
+		free(line);
+		return (NULL);
+	}
+	return (line);
 }
 
 /*
@@ -179,31 +221,4 @@ LES DIFFERENTS CAS A PENSER
 	a - Terminé par \n
 	b - Non terminé par \n
 3 - Cas ou buffer prends le nombre de caractere de la ligne
-*/
-
-/*
-Declare ssize_t read_len;
-Declare char *str
-Declare char *buffer
-Init static char *cache[FD_MAX]
-
-protect
-str = substr("", 0, 1)
-malloc buffer
-Tant que (read_len = je lis quelque chose)
-	str = strjoin(str, buffer)
-	Si str contient \n
-		sauvegarder la partie droite dans cache[fd]
-		str = la partie gauche de str
-		return str
-Si cache[fd] contient \n
-	sauvegarder la partie droite dans cache[fd]
-	str = la partie gauche de cache[fd]
-	return str
-Sinon si len(cache[fd]) > 0
-	str = cache[fd]
-	return str
-Sinon
-	free cache[fd]
-	return NULL
 */
