@@ -113,7 +113,9 @@ int	update_cache(char **cache)
 	char	*new_cache;
 	char	*ptr_nl;
 
+	printf("Begining of update_cache : %s\n", *cache);
 	ptr_nl = ft_strchr(*cache, '\n');
+	printf("Begining of update_cache : %p\n", ptr_nl);
 	if (ptr_nl == NULL)
 		new_cache = NULL;
 	else
@@ -125,6 +127,7 @@ int	update_cache(char **cache)
 	if (new_cache == NULL)
 		return (-1);
 	*cache = new_cache;
+	printf("End of update_cache, *cache = %s\n", *cache);
 	return (0);
 }
 
@@ -167,7 +170,7 @@ int	get_line(int fd, char **cache)
 		if (new_cache == NULL)
 			return (-1);
 		*cache = new_cache;
-		printf("in get_line : %s\n\n\n", *cache);
+		printf("in get_line *cache: %s\n\n\n", *cache);
 	}
 	return (0);
 }
@@ -203,9 +206,11 @@ char	*get_next_line(int fd)
 		free(cache[fd]);
 		return (NULL);
 	}
+	printf("Before update_cache : %s\n", cache[fd]);
 	check = update_cache(&cache[fd]);
 	if (check == -1)
 	{
+		printf("In error update_cache");
 		free(line);
 		return (NULL);
 	}
