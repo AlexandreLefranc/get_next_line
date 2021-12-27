@@ -125,9 +125,7 @@ int	update_cache(char **cache)
 	char	*new_cache;
 	char	*ptr_nl;
 
-	// printf("Begining of update_cache : %s\n", *cache);
 	ptr_nl = ft_strchr(*cache, '\n');
-	// printf("Begining of update_cache : %p\n", ptr_nl);
 	if (ptr_nl == NULL)
 	{
 		free(*cache);
@@ -141,7 +139,6 @@ int	update_cache(char **cache)
 	if (new_cache == NULL)
 		return (-1);
 	*cache = new_cache;
-	// printf("End of update_cache, *cache = %s\n", *cache);
 	return (0);
 }
 
@@ -159,7 +156,6 @@ char	*extract_line(const char *cache)
 		line = ft_substr(cache, 0, ptr_nl - cache + 1);
 	if (line == NULL)
 		return (NULL);
-	// printf("line in extract_line : %s\n", line);
 	if (line[0] == '\0')
 	{
 		free (line);
@@ -182,20 +178,17 @@ int	get_line(int fd, char **cache)
 	while (ret != 0 && ft_strchr(*cache, '\n') == NULL)
 	{
 		ret = read(fd, buf, BUFFER_SIZE);
-		// printf("ret in get_line : %zu\n", ret);
 		if (ret == -1)
 		{
 			free (*cache);
 			*cache = NULL;
 			return (-1);
 		}
-		// printf("Stop condition in get_line : %d\n", ret == 0 && *cache[0] != '\0');
 		if (ret == 0 && *cache[0] != '\0')
 			return (0);
 		buf[ret] = '\0';
 		new_cache = ft_strjoin(*cache, buf);
-		// printf("new_cache in get_line : %s\n", new_cache);
-		// free(*cache);
+		free(*cache);
 		*cache = NULL;
 		if (new_cache == NULL)
 			return (-1);
@@ -212,29 +205,22 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || BUFFER_SIZE < 1)
 		return (NULL);
-	// printf("cache before format_cache : %s\n", cache[fd]);
 	check = format_cache(&cache[fd]);
-	// printf("cache after format_cache : %s\n", cache[fd]);
 	if (check == -1)
 		return (NULL);
 	check = get_line(fd, &cache[fd]);
-	// printf("cache after get_line : %s\n", cache[fd]);
 	if (check == -1)
 		return (NULL);
 	line = extract_line(cache[fd]);
-	// printf("line after extract : %s\n", line);
 	if (line == NULL)
 	{
 		free(cache[fd]);
 		cache[fd] = NULL;
 		return (NULL);
 	}
-	// printf("Before update_cache : %s\n", cache[fd]);
 	check = update_cache(&cache[fd]);
-	// printf("After update_cache : %s\n", cache[fd]);
 	if (check == -1)
 	{
-		printf("In error update_cache\n");
 		free(line);
 		return (NULL);
 	}
