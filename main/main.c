@@ -19,44 +19,48 @@ int	main()
 {
 	int		fd = 0;
 	char	*str;
-	char	buffer[17];
+	char	*sleep = "sleep 1";
 
-	ssize_t	r = read(1000, buffer, 16);
-	printf("%zi\n", r);
+	// char	buffer[17];
+	// ssize_t	r = read(1000, buffer, 16);
+	// printf("%zi\n", r);
 
-	printf("\n\n----------------------\n\n");
+	printf("\n\n----------------------\nFD1000\n----------------------\n\n");
 	while ((str = get_next_line(1000)) != NULL)
 	{
-		printf("===========>%s", str);fflush(stdout);
+		printf("=================================>%s", str);fflush(stdout);
 		free(str);
+		system(sleep);
 	}
 	close(fd);
 
-	printf("\n\n----------------------\n\n");
+	printf("\n\n----------------------\nTEST1\n----------------------\n\n");
 	fd = open("../files/test1.txt", O_RDONLY);
-	//fd = open("../files/test_no_trailing_nl.txt", O_RDONLY);
 	while ((str = get_next_line(fd)) != NULL)
 	{
-		printf("===========>%s", str);fflush(stdout);
+		printf("=================================>%s", str);fflush(stdout);
 		free(str);
+		system(sleep);
 	}
 	close(fd);
 
-	printf("\n\n----------------------\n\n");
+	printf("\n\n----------------------\nNO TRAILING NL\n----------------------\n\n");
 	fd = open("../files/test_no_trailing_nl.txt", O_RDONLY);
 	while ((str = get_next_line(fd)) != NULL)
 	{
-		printf("===========>%s", str);fflush(stdout);
+		printf("=================================>%s", str);fflush(stdout);
 		free(str);
+		system(sleep);
 	}
 	close(fd);
-
-	printf("\n\n----------------------\n\n");
-	fd = open("../files/empty.txt", O_RDONLY);
-	while ((str = get_next_line(fd)) != NULL)
-	{
-		printf("===========>%s", str);fflush(stdout);
-		free(str);
-	}
-	close(fd);
+	//
+	// printf("\n\n----------------------\nEMPTY\n----------------------\n\n");
+	// fd = open("../files/empty.txt", O_RDONLY);
+	// while ((str = get_next_line(fd)) != NULL)
+	// {
+	// 	printf("=================================>%s", str);fflush(stdout);
+	// 	free(str);
+	// 	system(sleep);
+	// }
+	// close(fd);
 }
