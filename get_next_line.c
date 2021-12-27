@@ -10,11 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-// clangc main.c ../get_next_line.c -D BUFFER_SIZE=1 && ./a.out
+// clangc main.c ../get_next_line.c ../get_next_line_utils.c -D BUFFER_SIZE=1
 
 #include "get_next_line.h"
 
-int	format_cache(char **cache)
+static int	format_cache(char **cache)
 {
 	if (*cache == NULL)
 	{
@@ -25,7 +25,7 @@ int	format_cache(char **cache)
 	return (0);
 }
 
-int	update_cache(char **cache)
+static int	update_cache(char **cache)
 {
 	char	*new_cache;
 	char	*ptr_nl;
@@ -47,7 +47,7 @@ int	update_cache(char **cache)
 	return (0);
 }
 
-char	*extract_line(const char *cache)
+static char	*extract_line(const char *cache)
 {
 	char	*line;
 	char	*ptr_nl;
@@ -73,7 +73,7 @@ char	*extract_line(const char *cache)
 // The \n is not necessary at the end.
 // Should set *cache to NULL if nothing is read.
 // Should set *cache to NULL if ret == 0 and *cache == ""
-int	get_line(int fd, char **cache)
+static int	get_line(int fd, char **cache)
 {
 	char	buf[BUFFER_SIZE + 1];
 	char	*new_cache;
